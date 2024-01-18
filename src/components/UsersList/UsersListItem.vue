@@ -1,0 +1,193 @@
+<template>
+  <li class="user">
+    <div class="user__image">
+      <img v-if="user.avatar" :src="user.avatar" :alt="userFullName" />
+      <svg
+        v-else
+        width="21"
+        height="21"
+        viewBox="0 0 21 21"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M4.43951 15.9842C5.28951 15.3342 6.23951 14.8217 7.28951 14.4467C8.33951 14.0717 9.43951 13.8842 10.5895 13.8842C11.7395 13.8842 12.8395 14.0717 13.8895 14.4467C14.9395 14.8217 15.8895 15.3342 16.7395 15.9842C17.3228 15.3008 17.777 14.5258 18.102 13.6592C18.427 12.7925 18.5895 11.8675 18.5895 10.8842C18.5895 8.66749 17.8103 6.77999 16.252 5.22166C14.6937 3.66332 12.8062 2.88416 10.5895 2.88416C8.37284 2.88416 6.48534 3.66332 4.92701 5.22166C3.36867 6.77999 2.58951 8.66749 2.58951 10.8842C2.58951 11.8675 2.75201 12.7925 3.07701 13.6592C3.40201 14.5258 3.85617 15.3008 4.43951 15.9842ZM10.5895 11.8842C9.60617 11.8842 8.77701 11.5467 8.10201 10.8717C7.42701 10.1967 7.08951 9.36749 7.08951 8.38416C7.08951 7.40082 7.42701 6.57166 8.10201 5.89666C8.77701 5.22166 9.60617 4.88416 10.5895 4.88416C11.5728 4.88416 12.402 5.22166 13.077 5.89666C13.752 6.57166 14.0895 7.40082 14.0895 8.38416C14.0895 9.36749 13.752 10.1967 13.077 10.8717C12.402 11.5467 11.5728 11.8842 10.5895 11.8842ZM10.5895 20.8842C9.20617 20.8842 7.90617 20.6217 6.68951 20.0967C5.47284 19.5717 4.41451 18.8592 3.51451 17.9592C2.61451 17.0592 1.90201 16.0008 1.37701 14.7842C0.852008 13.5675 0.589508 12.2675 0.589508 10.8842C0.589508 9.50082 0.852008 8.20082 1.37701 6.98416C1.90201 5.76749 2.61451 4.70916 3.51451 3.80916C4.41451 2.90916 5.47284 2.19666 6.68951 1.67166C7.90617 1.14666 9.20617 0.884157 10.5895 0.884157C11.9728 0.884157 13.2728 1.14666 14.4895 1.67166C15.7062 2.19666 16.7645 2.90916 17.6645 3.80916C18.5645 4.70916 19.277 5.76749 19.802 6.98416C20.327 8.20082 20.5895 9.50082 20.5895 10.8842C20.5895 12.2675 20.327 13.5675 19.802 14.7842C19.277 16.0008 18.5645 17.0592 17.6645 17.9592C16.7645 18.8592 15.7062 19.5717 14.4895 20.0967C13.2728 20.6217 11.9728 20.8842 10.5895 20.8842ZM10.5895 18.8842C11.4728 18.8842 12.3062 18.755 13.0895 18.4967C13.8728 18.2383 14.5895 17.8675 15.2395 17.3842C14.5895 16.9008 13.8728 16.53 13.0895 16.2717C12.3062 16.0133 11.4728 15.8842 10.5895 15.8842C9.70617 15.8842 8.87284 16.0133 8.08951 16.2717C7.30617 16.53 6.58951 16.9008 5.93951 17.3842C6.58951 17.8675 7.30617 18.2383 8.08951 18.4967C8.87284 18.755 9.70617 18.8842 10.5895 18.8842ZM10.5895 9.88416C11.0228 9.88416 11.3812 9.74249 11.6645 9.45916C11.9478 9.17582 12.0895 8.81749 12.0895 8.38416C12.0895 7.95082 11.9478 7.59249 11.6645 7.30916C11.3812 7.02582 11.0228 6.88416 10.5895 6.88416C10.1562 6.88416 9.79784 7.02582 9.51451 7.30916C9.23117 7.59249 9.08951 7.95082 9.08951 8.38416C9.08951 8.81749 9.23117 9.17582 9.51451 9.45916C9.79784 9.74249 10.1562 9.88416 10.5895 9.88416Z"
+          fill="#1C1B1F"
+        />
+      </svg>
+    </div>
+    <div class="user__info">
+      <div class="user__name" @click="openDetails">{{ userFullName }}</div>
+      <a :href="userEmailLink" class="user__email">{{ user.email }}</a>
+    </div>
+    <div class="user__active">
+      <button class="user__edit-button button" @click="onEdit">edit</button>
+      <button class="user__button-delete" @click="openedDeletePopup"></button>
+    </div>
+    <popup-delete-user
+      v-if="isDeletePopupOpened"
+      @close="closeDeletePopup"
+      @delete="onUserDelete"
+    />
+    <popup-user-details v-if="isDetailsVisible" :user="user" @close="closeDetails" />
+  </li>
+</template>
+
+<script setup>
+import PopupDeleteUser from '../PopupDeleteUser.vue'
+import PopupUserDetails from '../PopupUserDetails.vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUsersStore } from '../../stores/users'
+
+const props = defineProps({
+  user: {
+    type: Object,
+    required: true
+  }
+})
+
+const usersStore = useUsersStore()
+
+const userFullName = computed(() => `${props.user.first_name} ${props.user.last_name}`)
+
+const userEmailLink = computed(() => `mailto:${props.user.email}`)
+
+// Delete user
+const isDeletePopupOpened = ref(false)
+
+function openedDeletePopup() {
+  isDeletePopupOpened.value = true
+}
+function closeDeletePopup() {
+  isDeletePopupOpened.value = false
+}
+
+function onUserDelete() {
+  usersStore.deleteUser(props.user.id)
+}
+
+// User Details
+const isDetailsVisible = ref(false)
+
+function openDetails() {
+  isDetailsVisible.value = true
+}
+function closeDetails() {
+  isDetailsVisible.value = false
+}
+
+const router = useRouter()
+function onEdit() {
+  router.push({
+    name: 'user-editor',
+    params: {
+      userId: props.user.id
+    }
+  })
+}
+</script>
+
+<style lang="scss" scoped>
+.user {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  padding: 10px 20px;
+  border: 1px solid rgb(239, 239, 239);
+  border-radius: 10px;
+  transition: border-color 0.3s;
+  @media (any-hover: hover) {
+    &:hover {
+      border-color: #d01c1f;
+    }
+  }
+  &__image {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex: 0 0 auto;
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+  &__info {
+    display: flex;
+    gap: 30px;
+    flex: 1 1 auto;
+    text-align: center;
+  }
+  &__name {
+    font-weight: 700;
+    font-size: 18px;
+    flex: 0 0 250px;
+    cursor: pointer;
+    transition: color 0.3s;
+    &:active {
+      color: #d01c1f;
+    }
+    @media (any-hover: hover) {
+      &:hover {
+        color: #d01c1f;
+      }
+    }
+  }
+  &__email {
+    &:active {
+      text-decoration: underline;
+    }
+    @media (any-hover: hover) {
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  &__active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+  }
+  &__edit-button {
+  }
+  &__button-delete {
+    width: 40px;
+    height: 40px;
+    position: relative;
+    padding: 10px;
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      height: 2px;
+      border-radius: 10px;
+      width: 50%;
+      background-color: #d01c1f;
+    }
+    &::before {
+      transform: translate(-50%, 0) rotate(45deg);
+    }
+    &::after {
+      transform: translate(-50%, 0) rotate(-45deg);
+    }
+  }
+}
+</style>
