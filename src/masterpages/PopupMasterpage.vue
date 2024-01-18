@@ -35,6 +35,7 @@ function closePopup() {
   justify-content: center;
   align-items: center;
   padding: 15px;
+  z-index: 50;
   &::before {
     content: '';
     position: absolute;

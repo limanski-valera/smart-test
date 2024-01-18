@@ -102,6 +102,9 @@ function onEdit() {
       border-color: #d01c1f;
     }
   }
+  @media (max-width: 767.98px) {
+    flex-direction: column;
+  }
   &__image {
     position: relative;
     width: 70px;
@@ -131,11 +134,14 @@ function onEdit() {
     gap: 30px;
     flex: 1 1 auto;
     text-align: center;
+    @media (max-width: 991.98px) {
+      flex-direction: column;
+      gap: 10px;
+    }
   }
   &__name {
     font-weight: 700;
     font-size: 18px;
-    flex: 0 0 250px;
     cursor: pointer;
     transition: color 0.3s;
     &:active {
@@ -145,6 +151,9 @@ function onEdit() {
       &:hover {
         color: #d01c1f;
       }
+    }
+    @media (min-width: 991.98px) {
+      flex: 0 0 250px;
     }
   }
   &__email {
